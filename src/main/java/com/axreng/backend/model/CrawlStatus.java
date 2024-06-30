@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CrawlStatus {
     @Expose
@@ -20,7 +20,7 @@ public class CrawlStatus {
         this.id = id;
         this.status = status;
         this.keyword = keyword;
-        this.urls = new ArrayList<>();
+        this.urls = new CopyOnWriteArrayList<>();
     }
 
     public String getId() {
@@ -41,6 +41,11 @@ public class CrawlStatus {
 
     public List<String> getUrls() {
         return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls.clear();
+        this.urls.addAll(urls);
     }
 
     public void addUrl(String url) {

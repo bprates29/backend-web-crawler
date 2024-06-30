@@ -11,8 +11,11 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,35 +26,47 @@ public class HttpUtil {
     private final String HREF_PATTERN = "href\\s*=\\s*\"([^\"]*)\"";
 
     public HttpUtil() {
-        this.client = HttpClient.newHttpClient();
+        this.client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
     }
 
     public HttpUtil(HttpClient client) {
         this.client = client;
     }
 
-    public String fetchHttpContent(String urlString) {
+    public CompletableFuture<String> fetchHttpContent(String urlString) {
+        return fetchHttpContentWithRetries(urlString, 2, 1);
+    }
+
+    private CompletableFuture<String> fetchHttpContentWithRetries(String urlString, int maxRetries, int attempt) {
         try {
             var request = HttpRequest.newBuilder()
                     .uri(new URI(urlString))
-                    .GET()
+                    .timeout(Duration.ofSeconds(10))
                     .build();
 
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                return response.body();
-            } else {
-                logger.error("Failed to retrieve content. HTTP response code: {} for URL: {}", response.statusCode(), urlString);
-                return null;
-            }
-        } catch (IOException | InterruptedException e) {
-            logger.error("Error retrieving content from URL: {}", urlString, e);
-            Thread.currentThread().interrupt();
-            return null;
-        } catch (Exception e) {
+            return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(response -> {
+                        if (response.statusCode() == 200) {
+                            logger.info("Fetched content from URL: {}", urlString);
+                            return response.body();
+                        } else {
+                            logger.error("Failed to retrieve content for URL: {}, Status Code: {}", urlString, response.statusCode());
+                            return null;
+                        }
+                    })
+                    .exceptionally(e -> {
+                        logger.error("Failed to retrieve content for URL: {} on attempt {} due to error: {}", urlString, attempt, e.toString());
+                        if (attempt < maxRetries && (e.getCause() instanceof HttpTimeoutException || e.getCause() instanceof IOException)) {
+                            return fetchHttpContentWithRetries(urlString, maxRetries, attempt + 1).join();
+                        }
+                        return null;
+                    });
+        } catch (URISyntaxException e) {
             logger.error("Invalid URL: {}", urlString, e);
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
     }
 
@@ -64,6 +79,7 @@ public class HttpUtil {
                 link = resolveAndValidateURL(link, baseUrl);
                 if (link != null) {
                     links.add(link);
+                    logger.info("Found internal link: {}", link);
                 }
             }
         }
@@ -93,6 +109,7 @@ public class HttpUtil {
             new URL(url).toURI();
             return true;
         } catch (Exception e) {
+            logger.error("Invalid URL: {}", url, e);
             return false;
         }
     }

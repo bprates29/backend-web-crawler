@@ -8,6 +8,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,12 +32,15 @@ class HttpUtilTest {
     void testFetchHttpContentSuccess() throws Exception {
         when(mockHttpResponse.statusCode()).thenReturn(200);
         when(mockHttpResponse.body()).thenReturn("<html>Test Content</html>");
-        when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-                .thenReturn(mockHttpResponse);
+
+        CompletableFuture<HttpResponse<String>> completableFuture = CompletableFuture.completedFuture(mockHttpResponse);
+        when(mockHttpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(completableFuture);
 
         HttpUtil httpUtil = new HttpUtil(mockHttpClient);
 
-        String result = httpUtil.fetchHttpContent("http://example.com");
+        CompletableFuture<String> futureResult = httpUtil.fetchHttpContent("http://example.com");
+        String result = futureResult.get();
 
         assertNotNull(result);
         assertEquals("<html>Test Content</html>", result);
@@ -45,12 +49,15 @@ class HttpUtilTest {
     @Test
     void testFetchHttpContentFail() throws Exception {
         when(mockHttpResponse.statusCode()).thenReturn(404);
-        when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-                .thenReturn(mockHttpResponse);
+
+        CompletableFuture<HttpResponse<String>> completableFuture = CompletableFuture.completedFuture(mockHttpResponse);
+        when(mockHttpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(completableFuture);
 
         HttpUtil httpUtil = new HttpUtil(mockHttpClient);
 
-        String result = httpUtil.fetchHttpContent("http://example.com");
+        CompletableFuture<String> futureResult = httpUtil.fetchHttpContent("http://example.com");
+        String result = futureResult.get(); // Bloquear para obter o resultado
 
         assertNull(result);
     }
