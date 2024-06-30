@@ -50,3 +50,7 @@ g
 7src/test/java/com/axreng/backend/util/HttpUtilTest.java,4/7/47426aa2dfa96d2262304e1e27139fb408db65ed
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+i
+9src/main/java/com/axreng/backend/service/LinkService.java,c/2/c269683851980623289d9822a96b3cf464a0cd30
+m
+=src/test/java/com/axreng/backend/service/LinkServiceTest.java,6/8/68f1364f6715c49565c5ba68731eb5db38a6f953

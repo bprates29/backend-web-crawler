@@ -69,4 +69,5 @@ Starts a new crawl with the provided keyword. The request body must contain a JS
 - **v1.3** - General improvements
 - **v1.4** - Addition of README
 - **v1.5** - Performance improvements
-- **v1.6** - Performance improvements (Official)
+- **v1.6** - Performance improvements
+- **v1.7** - Refactor code (Official)
