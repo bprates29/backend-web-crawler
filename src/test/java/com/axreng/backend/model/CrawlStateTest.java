@@ -64,9 +64,9 @@ class CrawlStateTest {
     @Test
     void testSetStatus() {
         var id = RandomString.make();
-        var status = Status.ACTIVE;
+        var status = "active";
         var keyword = RandomString.make();
-        var doneStatus = Status.DONE;
+        var doneStatus = "done";
         CrawlStatus crawlStatus = new CrawlStatus(id, status, keyword);
         crawlStatuses.put(id, crawlStatus);
         crawlState.setStatus(id, doneStatus);
@@ -76,7 +76,7 @@ class CrawlStateTest {
     @Test
     void testAddUrlToCrawlStatus() {
         var id = RandomString.make();
-        var status = Status.ACTIVE;
+        var status = "active";
         var keyword = RandomString.make();
         var url = RandomString.make();
         CrawlStatus crawlStatus = new CrawlStatus(id, status, keyword);
@@ -84,16 +84,4 @@ class CrawlStateTest {
         crawlState.addUrlToCrawlStatus(id, url);
         assertThat(crawlStatuses.get(id).getUrls(), contains(url));
     }
-
-/* Para fazer esse teste teria que colocar a variável de ambiente de alguma forma no teste,
-    como são testes unitários fica mais complexo, teria que fazer por Reflection
- */
-//    @Test
-//    void testAddAllAndValidatePendingUrl() {
-//        var url1 = crawlState.getTargetUrl() + RandomString.make();
-//        var url2 = crawlState.getTargetUrl() + RandomString.make();
-//        List<String> links = List.of(url1, url2);
-//        crawlState.addAllAndValidatePendingUrl(links);
-//        assertThat(crawlState.getPendingUrls(), containsInAnyOrder(url1, url2));
-//    }
 }

@@ -1,7 +1,6 @@
 package com.axreng.backend.service;
 
 import com.axreng.backend.model.CrawlState;
-import com.axreng.backend.model.Status;
 import com.axreng.backend.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class WebCrawlerService {
             }
         }
 
-        crawlState.setStatus(id, Status.DONE);
+        crawlState.setStatus(id, "done");
         logger.info("Crawling completed for ID: {}", id);
     }
 

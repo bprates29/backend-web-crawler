@@ -2,7 +2,6 @@ package com.axreng.backend.service;
 
 import com.axreng.backend.model.CrawlState;
 import com.axreng.backend.model.CrawlStatus;
-import com.axreng.backend.model.Status;
 import com.axreng.backend.util.HttpUtil;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,7 @@ class WebCrawlerServiceTest {
     void testShouldProcessUrl() {
         var id = RandomString.make();
         var url = "http://axur.com";
-        CrawlStatus crawlStatus = new CrawlStatus(id, Status.ACTIVE, "keyword");
+        CrawlStatus crawlStatus = new CrawlStatus(id, "active", "keyword");
         when(crawlStatuses.get(id)).thenReturn(crawlStatus);
         when(crawlState.getTargetUrl()).thenReturn(url);
         when(crawlState.getCrawlStatuses()).thenReturn(crawlStatuses);
@@ -46,6 +45,6 @@ class WebCrawlerServiceTest {
         verify(crawlState).addPendingUrl(url);
         verify(crawlState).addUrlToCrawlStatus(id, url);
         verify(crawlState).pollPendingUrl();
-        verify(crawlState).setStatus(id, Status.DONE);
+        verify(crawlState).setStatus(id, "done");
     }
 }

@@ -2,7 +2,6 @@ package com.axreng.backend.service;
 
 import com.axreng.backend.model.CrawlState;
 import com.axreng.backend.model.CrawlStatus;
-import com.axreng.backend.model.Status;
 import com.axreng.backend.util.HttpUtil;
 import com.axreng.backend.util.IdGenerator;
 import com.google.gson.Gson;
@@ -23,7 +22,7 @@ public class CrawlService {
 
     public String startCrawl(String keyword) {
         String id = IdGenerator.generateId();
-        CrawlStatus status = new CrawlStatus(id, Status.ACTIVE, keyword);
+        CrawlStatus status = new CrawlStatus(id, "active", keyword);
         crawlStatuses.put(id, status);
         var crawlState = new CrawlState(crawlStatuses);
 

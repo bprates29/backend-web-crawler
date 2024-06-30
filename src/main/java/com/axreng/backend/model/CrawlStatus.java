@@ -1,17 +1,22 @@
 package com.axreng.backend.model;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CrawlStatus {
+    @Expose
     private String id;
-    private Status status;
+    @Expose
+    private String status;
+    @Expose
     private List<String> urls;
     private String keyword;
 
-    public CrawlStatus(String id, Status status, String keyword) {
+    public CrawlStatus(String id, String status, String keyword) {
         this.id = id;
         this.status = status;
         this.keyword = keyword;
@@ -22,11 +27,11 @@ public class CrawlStatus {
         return id;
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -43,6 +48,9 @@ public class CrawlStatus {
     }
 
     public String toJson() {
-        return new Gson().toJson(this);
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(this);
     }
 }

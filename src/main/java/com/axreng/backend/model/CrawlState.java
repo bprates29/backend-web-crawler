@@ -56,7 +56,7 @@ public class CrawlState {
         return !pendingUrls.isEmpty();
     }
 
-    public void setStatus(String id, Status status) {
+    public void setStatus(String id, String status) {
         crawlStatuses.get(id).setStatus(status);
     }
 
