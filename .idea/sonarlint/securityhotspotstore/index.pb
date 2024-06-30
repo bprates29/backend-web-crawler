@@ -48,3 +48,5 @@ s
 Csrc/test/java/com/axreng/backend/service/WebCrawlerServiceTest.java,0/c/0c2b14521b101371d1df1d448db0f4750ee4d0c0
 g
 7src/test/java/com/axreng/backend/util/HttpUtilTest.java,4/7/47426aa2dfa96d2262304e1e27139fb408db65ed
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
