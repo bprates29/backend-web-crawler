@@ -5,17 +5,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
 public class CrawlState {
 
-    private final Queue<String> pendingUrls;
+    private final ConcurrentLinkedQueue<String> pendingUrls;
     private final Set<String> visitedUrls;
     private final ConcurrentMap<String, CrawlStatus> crawlStatuses;
     private final String targetUrl = System.getenv("BASE_URL");
 
     public CrawlState(ConcurrentMap<String, CrawlStatus> crawlStatuses) {
-        this.pendingUrls = new LinkedList<>();
+        this.pendingUrls = new ConcurrentLinkedQueue<>();
         this.visitedUrls = new HashSet<>();
         this.crawlStatuses = crawlStatuses;
     }
