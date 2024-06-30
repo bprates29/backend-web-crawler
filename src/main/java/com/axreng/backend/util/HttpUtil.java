@@ -19,21 +19,25 @@ import java.util.regex.Pattern;
 public class HttpUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
-    private static final HttpClient client = HttpClient.newHttpClient();
-    public static final String HREF_PATTERN = "href\\s*=\\s*\"([^\"]*)\"";
+    private final HttpClient client;
+    private final String HREF_PATTERN = "href\\s*=\\s*\"([^\"]*)\"";
 
-    private HttpUtil() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    public HttpUtil() {
+        this.client = HttpClient.newHttpClient();
     }
 
-    public static String fetchHttpContent(String urlString) {
+    public HttpUtil(HttpClient client) {
+        this.client = client;
+    }
+
+    public String fetchHttpContent(String urlString) {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
+            var request = HttpRequest.newBuilder()
                     .uri(new URI(urlString))
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 return response.body();
@@ -51,23 +55,26 @@ public class HttpUtil {
         }
     }
 
-    public static List<String> findInternalLinks(String content, String baseUrl) {
+    public List<String> findInternalLinks(String content, String baseUrl) {
         var links = new ArrayList<String>();
-        if (content == null) {
-            return links;
-        }
         Matcher matcher = Pattern.compile(HREF_PATTERN, Pattern.CASE_INSENSITIVE).matcher(content);
         while (matcher.find()) {
             String link = matcher.group(1);
-            link = resolveAndValidateLink(link, baseUrl);
             if (isValidLink(link)) {
-                links.add(link);
+                link = resolveAndValidateURL(link, baseUrl);
+                if (link != null) {
+                    links.add(link);
+                }
             }
         }
         return links;
     }
 
-    private static String resolveAndValidateLink(String link, String baseUrl) {
+    private boolean isValidLink(String link) {
+        return !link.isEmpty() && !link.startsWith("<") && !link.contains("mailto:") && !link.contains("../");
+    }
+
+    private String resolveAndValidateURL(String link, String baseUrl) {
         if (!link.startsWith("http")) {
             try {
                 URI baseUri = new URI(baseUrl);
@@ -81,11 +88,7 @@ public class HttpUtil {
         return isValidURL(link) ? link : null;
     }
 
-    private static boolean isValidLink(String link) {
-        return link != null && !link.isEmpty() && !link.startsWith("<") && !link.contains("mailto:") && !link.contains("../");
-    }
-
-    private static boolean isValidURL(String url) {
+    private boolean isValidURL(String url) {
         try {
             new URL(url).toURI();
             return true;

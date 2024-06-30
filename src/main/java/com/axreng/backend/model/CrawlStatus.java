@@ -7,11 +7,11 @@ import java.util.List;
 
 public class CrawlStatus {
     private String id;
-    private String status;
+    private Status status;
     private List<String> urls;
     private String keyword;
 
-    public CrawlStatus(String id, String status, String keyword) {
+    public CrawlStatus(String id, Status status, String keyword) {
         this.id = id;
         this.status = status;
         this.keyword = keyword;
@@ -22,12 +22,16 @@ public class CrawlStatus {
         return id;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getKeyword() {
+        return keyword;
     }
 
     public List<String> getUrls() {

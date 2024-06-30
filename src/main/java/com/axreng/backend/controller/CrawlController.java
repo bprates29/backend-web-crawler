@@ -7,6 +7,7 @@ import com.axreng.backend.service.CrawlService;
 import static spark.Spark.*;
 
 public class CrawlController {
+    public static final String CONTENT_TYPE = "application/json";
     private final CrawlService crawlService;
 
     public CrawlController() {
@@ -15,7 +16,7 @@ public class CrawlController {
 
     public void registerRoutes() {
         get("/crawl", (req, res) -> {
-            res.type("application/json");
+            res.type(CONTENT_TYPE);
             return crawlService.getAllCrawlStatus();
         });
 
@@ -26,7 +27,7 @@ public class CrawlController {
                 res.status(404);
                 return "ID not found";
             }
-            res.type("application/json");
+            res.type(CONTENT_TYPE);
             return status.toJson();
         });
 
@@ -37,7 +38,7 @@ public class CrawlController {
                 return "The search term must be between 4 and 32 characters.";
             }
             String id = crawlService.startCrawl(crawlRequest.getKeyword());
-            res.type("application/json");
+            res.type(CONTENT_TYPE);
             return "{\"id\": \"" + id + "\"}";
         });
     }

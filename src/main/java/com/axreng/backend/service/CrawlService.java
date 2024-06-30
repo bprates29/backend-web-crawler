@@ -1,6 +1,9 @@
 package com.axreng.backend.service;
 
+import com.axreng.backend.model.CrawlState;
 import com.axreng.backend.model.CrawlStatus;
+import com.axreng.backend.model.Status;
+import com.axreng.backend.util.HttpUtil;
 import com.axreng.backend.util.IdGenerator;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -11,17 +14,20 @@ import java.util.concurrent.ConcurrentMap;
 public class CrawlService {
 
     private final ConcurrentMap<String, CrawlStatus> crawlStatuses;
+    private final WebCrawlerService webCrawlerService;
 
     public CrawlService() {
         this.crawlStatuses = new ConcurrentHashMap<>();
+        this.webCrawlerService = new WebCrawlerService(new HttpUtil());
     }
 
     public String startCrawl(String keyword) {
         String id = IdGenerator.generateId();
-        CrawlStatus status = new CrawlStatus(id, "active", keyword);
+        CrawlStatus status = new CrawlStatus(id, Status.ACTIVE, keyword);
         crawlStatuses.put(id, status);
+        var crawlState = new CrawlState(crawlStatuses);
 
-        new Thread(() -> WebCrawlerService.startCrawling(id, keyword, crawlStatuses)).start();
+        new Thread(() -> webCrawlerService.startCrawling(id, crawlState)).start();
 
         return id;
     }

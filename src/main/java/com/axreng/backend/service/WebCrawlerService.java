@@ -1,55 +1,56 @@
 package com.axreng.backend.service;
 
 import com.axreng.backend.model.CrawlState;
-import com.axreng.backend.model.CrawlStatus;
+import com.axreng.backend.model.Status;
+import com.axreng.backend.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
-
-import static com.axreng.backend.util.HttpUtil.fetchHttpContent;
-import static com.axreng.backend.util.HttpUtil.findInternalLinks;
 
 public class WebCrawlerService {
 
     private static final Logger logger = LoggerFactory.getLogger(WebCrawlerService.class);
+    private final HttpUtil httpUtil;
 
+    public WebCrawlerService(HttpUtil httpUtil) {
+        this.httpUtil = httpUtil;
+    }
 
-    public static void startCrawling(String id, String keyword, ConcurrentMap<String, CrawlStatus> crawlStatuses) {
-        CrawlState crawlState = new CrawlState(crawlStatuses);
+    public void startCrawling(String id, CrawlState crawlState) {
         crawlState.addPendingUrl(crawlState.getTargetUrl());
 
         while (crawlState.hasPendingUrls()) {
             String url = crawlState.pollPendingUrl();
             if (shouldProcessUrl(url, crawlState)) {
-                processUrl(id, keyword, crawlState, url);
+                processUrl(id, crawlState, url);
             }
         }
 
-        crawlState.setStatus(id, "done");
+        crawlState.setStatus(id, Status.DONE);
         logger.info("Crawling completed for ID: {}", id);
     }
 
-    private static boolean shouldProcessUrl(String url, CrawlState crawlState) {
+    private boolean shouldProcessUrl(String url, CrawlState crawlState) {
         return url != null && !crawlState.isVisited(url);
     }
 
-    private static void processUrl(String id, String keyword, CrawlState crawlState, String url) {
+    private void processUrl(String id, CrawlState crawlState, String url) {
         crawlState.addVisitedUrl(url);
         logger.info("Processing URL: {}", url);
-        String content = fetchHttpContent(url);
+        var content = httpUtil.fetchHttpContent(url);
         if (content != null) {
-            processContent(id, keyword, crawlState, url, content);
+            processContent(id, crawlState, url, content);
         }
     }
 
-    private static void processContent(String id, String keyword, CrawlState crawlState, String url,
+    private void processContent(String id, CrawlState crawlState, String url,
                                        String content) {
-        if (content.toLowerCase().contains(keyword)) {
+        var keyword = crawlState.getCrawlStatuses().get(id).getKeyword();
+        if (content.toLowerCase().contains(keyword.toLowerCase())) {
             crawlState.addUrlToCrawlStatus(id, url);
         }
-        List<String> links = findInternalLinks(content, crawlState.getTargetUrl());
+        List<String> links = httpUtil.findInternalLinks(content, crawlState.getTargetUrl());
         crawlState.addAllAndValidatePendingUrl(links);
     }
 }
