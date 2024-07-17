@@ -1,0 +1,14 @@
+# IntelliJ IDEA specific files
+.idea/
+*.iml
+out/
+
+# Maven/Gradle build directories
+target/
+build/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp

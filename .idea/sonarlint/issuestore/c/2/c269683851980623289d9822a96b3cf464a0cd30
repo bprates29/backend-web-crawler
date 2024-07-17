@@ -1,6 +1,0 @@
-
-Œ
-java:S1598"éThis file "LinkService.java" should be located in "com/axreng/backend/util" directory, not in "/home/bernardo/Documents/sites/Axur/Desafio_Java_Backend_v2/Desafio Java Backend v2/axreng-test/src/main/java/com/axreng/backend/service".(Õ¥‘”ûÿÿÿÿ8š¹ä×†2
-r	java:S116"WRename this field "HREF_PATTERN" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŽøŠ8©¹ä×†2
-=
-java:S1170"!Make this final field static too.(ŽøŠ8ª¹ä×†2
